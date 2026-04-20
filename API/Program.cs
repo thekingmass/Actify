@@ -14,9 +14,16 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 }
 );
 
+builder.Services.AddCors();
+
+
 var app = builder.Build();
 
 // Configure middleware pipeline
+
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
+.WithOrigins("http://localhost:3000", "https://localhost:3000"));
+
 app.MapControllers();
 
 
