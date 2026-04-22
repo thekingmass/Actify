@@ -1,3 +1,4 @@
+using Application.Core;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblyContaining<Application.Activities.Queries.GetActivityList>());
+
 //Adding DB configuration for the API
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
@@ -15,6 +18,8 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 );
 
 builder.Services.AddCors();
+
+builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfiles).Assembly);
 
 
 var app = builder.Build();
