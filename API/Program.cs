@@ -27,7 +27,7 @@ var app = builder.Build();
 // Configure middleware pipeline
 
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
-.WithOrigins("http://localhost:3000", "https://localhost:3000"));
+.WithOrigins("http://localhost:3000", "https://localhost:3000", "http://localhost:4174"));
 
 app.MapControllers();
 
