@@ -1,7 +1,7 @@
-﻿using MediatR;
-using Persistence;
+﻿using AutoMapper;
 using Domain;
-using AutoMapper;
+using MediatR;
+using Persistence;
 
 namespace Application.Activities.Commands
 {
@@ -21,6 +21,7 @@ namespace Application.Activities.Commands
                 // ?? is called coalescing operator similar to ternary operator but for null values
 
                 mapper.Map(request.Activity, activity);
+                Console.WriteLine($"Dev Log: {System.Text.Json.JsonSerializer.Serialize(request.Activity)}");
 
                 await context.SaveChangesAsync(cancellationToken);
             }
