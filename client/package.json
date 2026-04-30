@@ -18,7 +18,9 @@
     "@tanstack/react-query": "^5.100.5",
     "@tanstack/react-query-devtools": "^5.100.5",
     "axios": "^1.15.1",
+    "date-fns": "^4.1.0",
     "react": "^19.2.5",
+    "react-calendar": "^6.0.1",
     "react-dom": "^19.2.5",
     "react-router": "^7.14.2"
   },
