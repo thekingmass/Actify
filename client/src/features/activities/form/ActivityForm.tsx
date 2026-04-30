@@ -1,16 +1,16 @@
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
 import { useActivities } from "../../../lib/hooks/useActivities";
+import { useNavigate, useParams } from "react-router";
 
-type Props = {
-    activity?: Activity
-    closeForm: () => void
-}
 
-export default function ActivityForm({ closeForm, activity }: Props) {
+export default function ActivityForm() {
 
-    const { updateActivity, createActivity } = useActivities();
+    const {id} = useParams();
+    const navigate = useNavigate();
+    const { updateActivity, createActivity, activity } = useActivities(id);
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+
+    const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const formData = new FormData(event.currentTarget);
@@ -24,11 +24,15 @@ export default function ActivityForm({ closeForm, activity }: Props) {
 
         if (activity) {
             data.id = activity.id;
-            await updateActivity.mutateAsync(data as unknown as Activity);        
-            closeForm();
+            await updateActivity.mutateAsync(data as unknown as Activity);
+            navigate(`/activities/${activity.id}`);
         } else {
-            await createActivity.mutateAsync(data as unknown as Activity);
-            closeForm();
+            createActivity.mutate(data as unknown as Activity, {
+                onSuccess: (id) => {
+                    navigate(`/activities/${id}`);
+                }
+            });
+            
         }
     };
 
@@ -45,7 +49,7 @@ export default function ActivityForm({ closeForm, activity }: Props) {
                 <TextField name='city' defaultValue={activity?.city || ''} label='City' />
                 <TextField name='venue' defaultValue={activity?.venue || ''} label='Venue' />
                 <Box sx={{ display: 'flex', justifyContent: 'end', gap: 3 }}>
-                    <Button onClick={closeForm} color='inherit'>Cancel</Button>
+                    <Button onClick={() => navigate('/activities')} color='inherit'>Cancel</Button>
                     <Button
                         type="submit"
                         color='success'
