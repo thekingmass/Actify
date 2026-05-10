@@ -2,8 +2,12 @@ import { observer } from "mobx-react-lite";
 import { Box, Button, ButtonGroup, List, ListItemText, Paper, Typography } from "@mui/material";
 import { useStore } from "../../lib/hooks/useStore.ts";
 
+
+// we have used a higer order component (observer) to make this component reactive to changes in the counterStore. Whenever the count or events change, this component will re-render to reflect the new state of the counterStore.
+
 const Counter = observer(function Counter() {
     const { counterStore } = useStore();
+
 
     return (
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
