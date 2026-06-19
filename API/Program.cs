@@ -32,7 +32,6 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 
 
-
 // Build the app
 
 var app = builder.Build();
@@ -45,7 +44,6 @@ app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
 .WithOrigins("http://localhost:3000", "https://localhost:3000", "http://localhost:4174"));
 
 app.MapControllers();
-
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
@@ -60,6 +58,5 @@ try
     var logger = services.GetRequiredService<ILogger<Program>>();
     logger.LogError(ex, "An Error Occurred During Migration.");
 }
-
 
 app.Run();
