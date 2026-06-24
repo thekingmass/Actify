@@ -5,8 +5,11 @@ import { useActivities } from "../../../lib/hooks/useActivities";
 
 export default function ActivityList() {
 
-    const { activities } = useActivities();
-    if (!activities) return <Box>Loading...</Box>
+    const { activities, isLoading } = useActivities();
+
+    if (isLoading) return <Box>Loading...</Box>;
+
+    if (!activities) return <Box>No activities found</Box>;
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {activities.map(activity => (

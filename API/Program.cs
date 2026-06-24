@@ -46,6 +46,13 @@ builder.Services.AddIdentityApiEndpoints<User>(opt =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
+builder.Services.ConfigureApplicationCookie(opt =>
+{
+    opt.Cookie.SameSite = SameSiteMode.None;              // required for cross-site cookie
+    opt.Cookie.SecurePolicy = CookieSecurePolicy.Always;  // required when SameSite=None
+    opt.Cookie.HttpOnly = true;
+});
+
 
 // Build the app
 
