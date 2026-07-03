@@ -10,10 +10,10 @@ namespace API.Controllers;
 public class ActivitiesController : BaseApiController
 
 {
-    
+
     // GET: api/Activities
     [HttpGet]
-    public async Task<ActionResult<List<Activity>>> GetActivities()
+    public async Task<ActionResult<List<ActivityDto>>> GetActivities()
     {
         return await Mediator.Send(new GetActivityList.Query());
     }
@@ -21,7 +21,7 @@ public class ActivitiesController : BaseApiController
     [AllowAnonymous]
     // GET: api/Activities/{id}
     [HttpGet("{id}")]
-    public async Task<ActionResult<Activity>> GetActivityDetail(string id)
+    public async Task<ActionResult<ActivityDto>> GetActivityDetail(string id)
     {
         return HandleResult(await Mediator.Send(new GetActivityDetails.Query { Id = id }));
     }
@@ -34,15 +34,24 @@ public class ActivitiesController : BaseApiController
 
     }
 
-    [HttpPut]
-    public async Task<ActionResult> EditActivity(EditActivityDto activity)
+    [HttpPut("{id}")]
+    [Authorize(Policy  = "IsActivityHost")]
+    public async Task<ActionResult> EditActivity(EditActivityDto activity, string id)
     {
+        activity.Id = id;
         return HandleResult(await Mediator.Send(new EditActivity.Command { ActivityDto = activity }));
     }
 
     [HttpDelete("{Id}")]
+    [Authorize(Policy = "IsActivityHost")]
     public async Task<ActionResult> DeleteActivity(string Id)
     {
         return HandleResult(await Mediator.Send(new DeleteActivity.Command { Id = Id }));
+    }
+
+    [HttpPost("{id}/attend")]
+    public async Task<IActionResult> Attend(string id)
+    {
+        return HandleResult(await Mediator.Send(new UpdateAttendance.Command { Id = id }));
     }
 }

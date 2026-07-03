@@ -1,8 +1,11 @@
 using API.Middleware;
+using Application.Activities.Queries;
 using Application.Activities.Validators;
 using Application.Core;
+using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -17,12 +20,17 @@ builder.Services.AddControllers(opt =>
 {
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     opt.Filters.Add(new AuthorizeFilter(policy));
+}).AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 });
 
 builder.Services.AddMediatR(x => { 
     x.RegisterServicesFromAssemblyContaining<Application.Activities.Queries.GetActivityList>();
     x.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
+
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 
 //Adding DB configuration service for the API
 builder.Services.AddDbContext<AppDbContext>(opt =>
@@ -45,6 +53,15 @@ builder.Services.AddIdentityApiEndpoints<User>(opt =>
 })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
+
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("IsActivityHost", policy =>
+    {
+        policy.Requirements.Add(new IsHostRequirement());
+    });
+
+builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
 builder.Services.ConfigureApplicationCookie(opt =>
 {

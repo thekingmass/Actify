@@ -24,5 +24,9 @@ namespace Domain
 
         public double Longitude { get; set; }
 
+        // Navigation property for the attendees of the activity
+
+        public ICollection<ActivityAttendee> Attendees { get; set; } = [];
+
     }
 }
