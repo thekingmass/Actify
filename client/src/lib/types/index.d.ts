@@ -9,13 +9,25 @@ type Activity = {
   venue: string
   latitude: number
   longitude: number
+  attendees: Profile[]
+  hostId: string
+  isHost: boolean
+  isGoing: boolean
+  hostDisplayName: string
+}
+
+type Profile = {
+    id: string
+    displayName: string
+    bio?: string
+    imageUrl?: string
 }
 
 type User = {
     id: string
     email: string
     displayName: string
-    image?: string
+    imageUrl?: string
 }
 
 type LocationIQSuggestion = {

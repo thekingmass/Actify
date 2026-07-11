@@ -54,6 +54,8 @@ agent.interceptors.response.use(
                 router.navigate('/server-error', {state: {error: data}});
                 break;
         }
+
+        return Promise.reject(error);
     }
 );
 
