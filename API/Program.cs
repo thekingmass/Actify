@@ -5,6 +5,7 @@ using Application.Core;
 using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Photos;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -31,6 +32,8 @@ builder.Services.AddMediatR(x => {
 });
 
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 
 //Adding DB configuration service for the API
 builder.Services.AddDbContext<AppDbContext>(opt =>
@@ -69,6 +72,9 @@ builder.Services.ConfigureApplicationCookie(opt =>
     opt.Cookie.SecurePolicy = CookieSecurePolicy.Always;  // required when SameSite=None
     opt.Cookie.HttpOnly = true;
 });
+
+// Add Cloudinary settings configuration
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 
 // Build the app
