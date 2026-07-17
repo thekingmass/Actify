@@ -44,6 +44,8 @@ export default function AvatarPopover({ profile }: Props) {
                 }}
                 onClose={handlePopoverClose}
                 disableRestoreFocus
+                disableAutoFocus
+                disableEnforceFocus
             >
                 <ProfileCard profile={profile} />
             </Popover>
