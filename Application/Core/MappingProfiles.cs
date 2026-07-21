@@ -21,11 +21,18 @@ public class MappingProfiles : Profile
                 s.Attendees.FirstOrDefault(x => x.IsHost)!.User.Id))
             .ForMember(d => d.HostDisplayName, o => o.MapFrom(s =>
                 s.Attendees.FirstOrDefault(x => x.IsHost)!.User.DisplayName));
+
         CreateMap<ActivityAttendee, UserProfile>()
             .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.User.DisplayName))
             .ForMember(d => d.Id, o => o.MapFrom(s => s.User.Id))
             .ForMember(d => d.Bio, o => o.MapFrom(s => s.User.Bio))
             .ForMember(d => d.ImageUrl, o => o.MapFrom(s => s.User.ImageUrl));
+
         CreateMap<User, UserProfile>();
+
+        CreateMap<Comment, CommentDto>()
+            .ForMember(d => d.UserId, o => o.MapFrom(s => s.User.Id))
+            .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.User.DisplayName))
+            .ForMember(d => d.ImageUrl, o => o.MapFrom(s => s.User.ImageUrl));
     }
 }

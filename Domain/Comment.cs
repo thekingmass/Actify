@@ -11,7 +11,7 @@ namespace Domain
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public required string Body { get; set; }
-        public required DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         //Navigation properties
         public required string UserId { get; set; }
