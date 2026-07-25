@@ -31,7 +31,7 @@ namespace Infrastructure.Security
             return await dbContext.Users
                 .Include(x => x.Photos)
                 .FirstOrDefaultAsync(x => x.Id == userId)
-                    ?? throw new UnauthorizedAccessException("Cannot find user in the DB");
+                    ?? throw new UnauthorizedAccessException("Cannot find user");
         }
     }
 }

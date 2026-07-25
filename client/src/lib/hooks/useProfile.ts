@@ -3,7 +3,7 @@ import agent from "../api/agent.ts";
 import { useMemo } from "react";
 import type { EditProfileSchema } from "../schemas/editProfileSchema.ts";
 
-export const useProfile = (id?: string) => {
+export const useProfile = (id?: string, predicate?: string) => {
     const queryClient = useQueryClient();
 
     const { data: profile, isLoading: loadingProfile } = useQuery<Profile>({
@@ -12,7 +12,7 @@ export const useProfile = (id?: string) => {
             const response = await agent.get<Profile>(`/profiles/${id}`);
             return response.data
         },
-        enabled: !!id
+        enabled: !!id && !predicate
         // Single negation converts the value to a boolean and negates it
         // double negation converts the value to a boolean and negates it twice, effectively returning the original boolean value.
         // so if no Id is provided, the query will not run.
@@ -24,7 +24,16 @@ export const useProfile = (id?: string) => {
             const response = await agent.get<Photo[]>(`/profiles/${id}/photos`);
             return response.data
         },
-        enabled: !!id
+        enabled: !!id && !predicate
+    });
+
+   const {data: followings, isLoading: loadingFollowings} = useQuery<Profile[]>({
+        queryKey: ['followings', id, predicate],
+        queryFn: async () => {
+            const response = await agent.get<Profile[]>(`/profiles/${id}/follow-list?predicate=${predicate}`);
+            return response.data
+        },
+        enabled: !!id && !!predicate
     });
 
     const uploadPhoto = useMutation({
@@ -123,7 +132,25 @@ export const useProfile = (id?: string) => {
         }
     });
 
+    const updateFollowing = useMutation({
+        mutationFn: async () => {
+            await agent.post(`/profiles/${id}/follow`);
+        },
+        onSuccess: () => {
+            queryClient.setQueryData(["profile", id], (profile: Profile) => {
+                queryClient.invalidateQueries({queryKey: ['followings', id, 'followers']});
+                if(!profile || profile.followersCount == undefined) return profile;
 
+                return {
+                    ...profile,
+                    amIFollowing: !profile.amIFollowing,
+                    followersCount: profile.amIFollowing 
+                        ? profile.followersCount - 1 
+                        : profile.followersCount + 1
+                }
+            })
+        }
+    }) 
 
     const isCurrentUser = useMemo(() => {
         return id === queryClient.getQueryData<User>(['user'])?.id
@@ -138,6 +165,9 @@ export const useProfile = (id?: string) => {
         uploadPhoto,
         setMainPhoto,
         deletePhoto,
-        updateProfile
+        updateProfile,
+        updateFollowing,
+        followings,
+        loadingFollowings
     }
 }
