@@ -1,5 +1,5 @@
-import { Box, Card, CardContent, CardMedia, Chip, Divider, Typography } from "@mui/material";
-import { Person } from "@mui/icons-material";
+import { Box, Card, CardContent, CardMedia, Divider, Tooltip, Typography } from "@mui/material";
+import { CheckCircle, Person } from "@mui/icons-material";
 import { Link } from "react-router";
 
 type Props = {
@@ -19,22 +19,30 @@ export default function ProfileCard({ profile }: Props) {
                 />
                 <CardContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Typography variant="h5">{profile.displayName}</Typography>
+                        <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            {profile.displayName}
+                            {profile.amIFollowing &&
+                                <Tooltip title="Following" arrow placement="top">
+                                    <CheckCircle fontSize="small" color="secondary" />
+                                </Tooltip>}
+                        </Typography>
 
-                        {profile.bio &&
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    textOverflow: 'ellipsis',
-                                    overflow: 'hidden',
-                                    whiteSpace: 'nowrap'
-                                }}
-                            >
-                                {profile?.bio}
-                            </Typography>}
 
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                textOverflow: 'ellipsis',
+                                overflow: 'hidden',
+                                whiteSpace: 'nowrap',
+                                fontStyle: profile.bio ? 'normal' : 'italic',
+                                opacity: profile.bio ? 1 : 0.6
+                            }}
+                        >
+                            {profile.bio || 'No bio yet'}
+                        </Typography>
+                        {/* 
                         {profile.amIFollowing &&
-                            <Chip size='small' label='Following' color="secondary" variant="outlined" />}
+                            <Chip size='small' label='Following' color="secondary" variant="outlined" />} */}
                     </Box>
                 </CardContent>
                 <Divider sx={{ mb: 2 }} />

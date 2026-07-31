@@ -4,7 +4,7 @@ namespace Application.Activities.DTOs;
 
 public class CommentDto
 {
-    public required string Id { get; set; }
+    public required Guid Id { get; set; }
     public required string Body { get; set; }
     public required DateTime CreatedAt { get; set; }
 

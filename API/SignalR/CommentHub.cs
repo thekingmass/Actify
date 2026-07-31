@@ -18,7 +18,7 @@ public class CommentHub(IMediator mediator) : Hub
         //send the comment to all clients in the group with the activityId
         if (result.IsSuccess)
         {
-            await Clients.Group(command.ActivityId).SendAsync("ReceiveComment", result.Value);
+            await Clients.Group(command.ActivityId.ToString()).SendAsync("ReceiveComment", result.Value);
         }
     }
     public override async Task OnConnectedAsync()
@@ -27,14 +27,15 @@ public class CommentHub(IMediator mediator) : Hub
         var httpContext = Context.GetHttpContext();
         var activityId = httpContext?.Request.Query["activityId"].ToString();
 
-        //if the activityId is null or empty, throw an exception
-        if(string.IsNullOrEmpty(activityId)) throw new HubException("No Activity with this Id");
+        //if the activityId is null or not a valid Guid, throw an exception
+        if (!Guid.TryParse(activityId, out var activityGuid))
+            throw new HubException("No Activity with this Id");
 
         //add the connection to the group with the activityId
-        await Groups.AddToGroupAsync(Context.ConnectionId, activityId);
+        await Groups.AddToGroupAsync(Context.ConnectionId, activityGuid.ToString());
 
         //get the comments for the activity from the mediator
-        var result = await mediator.Send(new GetComments.Query{ActivityId = activityId});
+        var result = await mediator.Send(new GetComments.Query{ActivityId = activityGuid});
 
         //send the comments to the caller
         if(result.IsSuccess)

@@ -23,7 +23,8 @@ namespace Infrastructure.Security
 
             var httpContext = httpContextAccessor.HttpContext;
 
-            if (httpContext?.GetRouteValue("id") is not string activityId) return;
+            if (httpContext?.GetRouteValue("id") is not string routeId
+                || !Guid.TryParse(routeId, out var activityId)) return;
 
             var attendee = await dbContext.ActivityAttendee
                 .SingleOrDefaultAsync(x => x.UserId == userId && x.ActivityId == activityId);

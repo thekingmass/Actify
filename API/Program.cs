@@ -39,13 +39,16 @@ builder.Services.AddScoped<IPhotoService, PhotoService>();
 //Adding DB configuration service for the API
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 }
 );
 
 builder.Services.AddCors();
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(opt =>
+{
+    opt.EnableDetailedErrors = builder.Environment.IsDevelopment();
+});
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfiles).Assembly);
 

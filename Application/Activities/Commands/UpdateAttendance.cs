@@ -12,7 +12,7 @@ public class UpdateAttendance
 {
     public class Command : IRequest<Result<Unit>>
     {
-        public required string Id { get; set; }
+        public required Guid Id { get; set; }
     }
 
     public class Handler(IUserAccessor userAccessor, AppDbContext context) : IRequestHandler<Command, Result<Unit>>

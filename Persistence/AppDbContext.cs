@@ -43,10 +43,12 @@ namespace Persistence
                     .HasForeignKey(o => o.ObserverId)
                     .OnDelete(DeleteBehavior.Cascade);
 
+                // SQL Server does not allow two cascading FKs from AspNetUsers to the
+                // same table (multiple cascade paths), so this side must not cascade.
                 x.HasOne(o => o.Target)
                     .WithMany(f => f.Followers)
                     .HasForeignKey(o => o.TargetId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.NoAction);
             });
                 
 

@@ -44,5 +44,11 @@ public class MappingProfiles : Profile
             .ForMember(d => d.UserId, o => o.MapFrom(s => s.User.Id))
             .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.User.DisplayName))
             .ForMember(d => d.ImageUrl, o => o.MapFrom(s => s.User.ImageUrl));
+
+        CreateMap<Activity, UserActivityDto>()
+            .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+            .ForMember(d => d.Title, o => o.MapFrom(s => s.Title))
+            .ForMember(d => d.Category, o => o.MapFrom(s => s.Category))
+            .ForMember(d => d.Date, o => o.MapFrom(s => s.Date));
     }
 }

@@ -3,7 +3,7 @@ import agent from "../api/agent.ts";
 import { useMemo } from "react";
 import type { EditProfileSchema } from "../schemas/editProfileSchema.ts";
 
-export const useProfile = (id?: string, predicate?: string) => {
+export const useProfile = (id?: string, predicate?: string, filter?: string) => {
     const queryClient = useQueryClient();
 
     const { data: profile, isLoading: loadingProfile } = useQuery<Profile>({
@@ -27,13 +27,22 @@ export const useProfile = (id?: string, predicate?: string) => {
         enabled: !!id && !predicate
     });
 
-   const {data: followings, isLoading: loadingFollowings} = useQuery<Profile[]>({
+    const { data: followings, isLoading: loadingFollowings } = useQuery<Profile[]>({
         queryKey: ['followings', id, predicate],
         queryFn: async () => {
             const response = await agent.get<Profile[]>(`/profiles/${id}/follow-list?predicate=${predicate}`);
             return response.data
         },
         enabled: !!id && !!predicate
+    });
+
+    const {data: userActivities, isLoading: loadingUserActivities} = useQuery<UserActivity[]>({
+        queryKey: ['userActivity', id, filter],
+        queryFn: async () => {
+            const response = await agent.get<UserActivity[]>(`profiles/${id}/activities?filter=${filter}`);
+            return response.data;
+        },
+        enabled: !!id && !!filter
     });
 
     const uploadPhoto = useMutation({
@@ -70,6 +79,11 @@ export const useProfile = (id?: string, predicate?: string) => {
                     imageUrl: data.imageUrl ?? photo.url
                 }
             });
+
+            // Avatars are also rendered from the activities and followings caches
+            // (host avatar, attendee lists, popovers), so those must be refetched too.
+            await queryClient.invalidateQueries({ queryKey: ['activities'] });
+            await queryClient.invalidateQueries({ queryKey: ['followings'] });
         }
     });
 
@@ -77,7 +91,7 @@ export const useProfile = (id?: string, predicate?: string) => {
         mutationFn: async (photo: Photo) => {
             await agent.put(`/profiles/${photo.id}/setMain`, {});
         },
-        onSuccess: (_, photo) => {
+        onSuccess: async (_, photo) => {
             queryClient.setQueryData(['user'], (userData: User) => {
                 if (!userData) return userData;
                 return {
@@ -92,6 +106,10 @@ export const useProfile = (id?: string, predicate?: string) => {
                     imageUrl: photo.url
                 }
             });
+
+            // Refresh the caches that embed a copy of the user's avatar.
+            await queryClient.invalidateQueries({ queryKey: ['activities'] });
+            await queryClient.invalidateQueries({ queryKey: ['followings'] });
         }
     });
 
@@ -138,19 +156,20 @@ export const useProfile = (id?: string, predicate?: string) => {
         },
         onSuccess: () => {
             queryClient.setQueryData(["profile", id], (profile: Profile) => {
-                queryClient.invalidateQueries({queryKey: ['followings', id, 'followers']});
-                if(!profile || profile.followersCount == undefined) return profile;
+                queryClient.invalidateQueries({ queryKey: ['followings', id, 'followers'] });
+                if (!profile || profile.followersCount == undefined) return profile;
 
                 return {
                     ...profile,
                     amIFollowing: !profile.amIFollowing,
-                    followersCount: profile.amIFollowing 
-                        ? profile.followersCount - 1 
+                    followersCount: profile.amIFollowing
+                        ? profile.followersCount - 1
                         : profile.followersCount + 1
                 }
             })
         }
-    }) 
+    });
+
 
     const isCurrentUser = useMemo(() => {
         return id === queryClient.getQueryData<User>(['user'])?.id
@@ -168,6 +187,9 @@ export const useProfile = (id?: string, predicate?: string) => {
         updateProfile,
         updateFollowing,
         followings,
-        loadingFollowings
+        loadingFollowings,
+        userActivities,
+        loadingUserActivities
+
     }
 }

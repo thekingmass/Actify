@@ -15,7 +15,7 @@ namespace Application.Activities.Queries
     {
         public class Query : IRequest<Result<ActivityDto>>
         {
-            public required string Id { get; set; }
+            public required Guid Id { get; set; }
         }
 
         public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) : IRequestHandler<Query, Result<ActivityDto>>

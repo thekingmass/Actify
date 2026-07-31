@@ -1,4 +1,5 @@
-﻿using Application.Profiles.Commands;
+﻿using Application.Core;
+using Application.Profiles.Commands;
 using Application.Profiles.DTOs;
 using Application.Profiles.Queries;
 using Domain;
@@ -21,13 +22,13 @@ namespace API.Controllers
         }
 
         [HttpDelete("{photoId}/photos")]
-        public async Task<ActionResult> DeletePhoto(string photoId)
+        public async Task<ActionResult> DeletePhoto(Guid photoId)
         {
             return HandleResult(await Mediator.Send(new DeletePhoto.Command { PhotoId = photoId }));
         }
 
         [HttpPut("{photoId}/setMain")]
-        public async Task<IActionResult> SetMain(string photoId)
+        public async Task<IActionResult> SetMain(Guid photoId)
         {
             return HandleResult(await Mediator.Send(new SetMainPhoto.Command { Id = photoId }));
         }
@@ -54,6 +55,13 @@ namespace API.Controllers
         public async Task<ActionResult<List<UserProfile>>> GetFollowings(string userId, string predicate)
         {
             return HandleResult(await Mediator.Send(new GetFollowings.Query {UserId = userId, Predicate = predicate}));
+        }
+
+        // /profiles/bob-id/activities?filter=past
+        [HttpGet("{userId}/activities")]
+        public async Task<ActionResult<Result<List<UserActivityDto>>>> GetUserActivities(string userId, [FromQuery]string filter)
+        {
+            return HandleResult(await Mediator.Send(new GetUserActivities.Query{UserId = userId,Filter = filter}));
         }
     }
 }

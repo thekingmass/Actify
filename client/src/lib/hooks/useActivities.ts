@@ -1,34 +1,51 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import agent from "../api/agent";
 import { useLocation } from "react-router";
 import { useAccount } from "./useAccount";
+import { useStore } from "./useStore";
 
 
 export const useActivities = (id?: string) => {
 
+    const {activityStore: {filter, startDate}} = useStore();
     const location = useLocation();
     const { currentUser } = useAccount();
     const queryClient = useQueryClient();
 
     // Fetch activities
-    const { data: activities, isLoading } = useQuery({
-        queryKey: ['activities'],
-        queryFn: async () => {
-            const response = await agent.get<Activity[]>('/activities');
+    const { data: activitiesGroup, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery<PagedList<Activity, string>>({
+        queryKey: ['activities', filter, startDate],
+        queryFn: async ({ pageParam = null }) => {
+            const response = await agent.get<PagedList<Activity, string>>('/activities', {
+                params: {
+                    cursor: pageParam,
+                    pageSise: 3,
+                    filter,
+                    startDate
+                }
+            });
             return response.data;
         },
+        staleTime: 1000 * 60 * 5, // setting the stale time to 5 minutes to reduce unnecessary refetching
+        placeholderData: keepPreviousData,
+        initialPageParam: null,
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
         enabled: !id && location.pathname === '/activities' && !!currentUser,
-        select: data => {
-            return data.map(activity => {
-                const host = activity.attendees.find(x => x.id === activity.hostId);
-                return {
-                    ...activity,
-                    isHost: currentUser?.id === activity.hostId,
-                    isGoing: activity.attendees.some(x => x.id === currentUser?.id),
-                    hostImageUrl: host?.imageUrl,
-                }
-            })
-        }
+        select: data => ({
+            ...data,
+            pages: data.pages.map((page) => ({
+                ...page,
+                items: page.items.map((activity) => {
+                    const host = activity.attendees.find(x => x.id === activity.hostId);
+                    return {
+                        ...activity,
+                        isHost: currentUser?.id === activity.hostId,
+                        isGoing: activity.attendees.some(x => x.id === currentUser?.id),
+                        hostImageUrl: host?.imageUrl,
+                    }
+                })
+            }))
+        })
     });
 
     // Activities/id
@@ -93,7 +110,7 @@ export const useActivities = (id?: string) => {
 
             queryClient.setQueryData<Activity>(['activities', activityId], oldActivity => {
                 if (!oldActivity || !currentUser) {
-                    return oldActivity; 
+                    return oldActivity;
                 }
 
                 const isHost = oldActivity.hostId === currentUser.id;
@@ -104,9 +121,9 @@ export const useActivities = (id?: string) => {
                     isCancelled: isHost ? !oldActivity.isCancelled : oldActivity.isCancelled,
                     attendees: isAttending
                         ? isHost
-                            ? oldActivity.attendees 
-                            : oldActivity.attendees.filter(x => x.id !== currentUser.id) 
-                        : [...oldActivity.attendees, { 
+                            ? oldActivity.attendees
+                            : oldActivity.attendees.filter(x => x.id !== currentUser.id)
+                        : [...oldActivity.attendees, {
                             id: currentUser.id,
                             displayName: currentUser.displayName,
                             imageUrl: currentUser.imageUrl,
@@ -130,10 +147,13 @@ export const useActivities = (id?: string) => {
         }
     })
 
-    
+
 
     return {
-        activities,
+        activitiesGroup,
+        isFetchingNextPage,
+        fetchNextPage,
+        hasNextPage,
         isLoading,
         activity,
         isLoadingActivity,

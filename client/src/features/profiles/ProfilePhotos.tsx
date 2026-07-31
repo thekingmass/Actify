@@ -25,28 +25,31 @@ export default function ProfilePhotos() {
     if (!photos) return <Typography>No photos found for this user</Typography>
 
     return (
-        <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant='h5'>Photos</Typography>
+        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+            <Box sx={{ flexShrink: 0 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant='h5'>Photos</Typography>
 
-                {isCurrentUser && (
-                    <Button onClick={() => setEditMode(!editMode)}>
-                        {editMode ? 'Cancel' : 'Add photo'}
-                    </Button>)}
+                    {isCurrentUser && (
+                        <Button onClick={() => setEditMode(!editMode)}>
+                            {editMode ? 'Cancel' : 'Add photo'}
+                        </Button>)}
+                </Box>
+                <Divider sx={{ my: 2 }} />
             </Box>
-            <Divider sx={{ my: 2 }} />
 
-            {editMode ? (
-                <PhotoUploadWidget
-                    uploadPhoto={handlePhotoUpload}
-                    loading={uploadPhoto.isPending}
-                />
-            ) : (
-                <>
-                    {photos.length === 0 ? (
-                        <Typography>No photos added yet</Typography>
-                    ) : (
-                        <ImageList sx={{ height: 450 }} cols={6} rowHeight={164}>
+            <Box sx={{ flexGrow: 1, minHeight: 0, overflowY: 'auto' }}>
+                {editMode ? (
+                    <PhotoUploadWidget
+                        uploadPhoto={handlePhotoUpload}
+                        loading={uploadPhoto.isPending}
+                    />
+                ) : (
+                    <>
+                        {photos.length === 0 ? (
+                            <Typography>No photos added yet</Typography>
+                        ) : (
+                            <ImageList sx={{ m: 0, overflow: 'visible' }} cols={6} rowHeight={164}>
                             {photos.map((item) => (
                                 <ImageListItem key={item.id}>
                                     <img
@@ -82,11 +85,11 @@ export default function ProfilePhotos() {
                                     )}
                                 </ImageListItem>
                             ))}
-                        </ImageList>
-                    )}
-                </>
-
-            )}
+                            </ImageList>
+                        )}
+                    </>
+                )}
+            </Box>
         </Box>
     );
 }

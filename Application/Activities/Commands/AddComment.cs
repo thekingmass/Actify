@@ -16,7 +16,7 @@ public class AddComment
 {
     public class Command : IRequest<Result<CommentDto>>
     {
-        public required string ActivityId { get; set; }
+        public required Guid ActivityId { get; set; }
         public required string Body { get; set; }
     }
 
@@ -40,7 +40,11 @@ public class AddComment
                 Body = request.Body
             };
 
-            activity.Comments.Add(comment);
+            // Add through the DbSet so the entity is explicitly tracked as Added.
+            // Adding via activity.Comments would let EF infer the state from the key,
+            // and because Comment.Id is pre-populated with Guid.NewGuid() and SQL Server
+            // treats Guid keys as store-generated, EF would infer Modified and emit an UPDATE.
+            context.Comments.Add(comment);
 
             var success = await context.SaveChangesAsync(cancellationToken) > 0;
 

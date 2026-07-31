@@ -13,7 +13,7 @@ public class GetComments
 {
     public class Query : IRequest<Result<List<CommentDto>>>
     {
-        public required string ActivityId { get; set; }
+        public required Guid ActivityId { get; set; }
     }
 
     public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<List<CommentDto>>>

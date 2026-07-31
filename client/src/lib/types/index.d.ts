@@ -17,6 +17,18 @@ type Activity = {
   hostImageUrl?: string
 }
 
+type UserActivity = {
+    id: Guid
+    title: string
+    category: string
+    date: Date
+}
+
+type PagedList<T, TCursor> = {
+  items: T[],
+  nextCursor: TCursor
+}
+
 type Profile = {
     id: string
     displayName: string

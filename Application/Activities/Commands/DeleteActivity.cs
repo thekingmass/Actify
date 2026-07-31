@@ -9,7 +9,7 @@ namespace Application.Activities.Commands
     {
         public class Command : IRequest<Result<Unit>> // Unnit is used to represent a void return type in MediatR
         {
-            public required string Id { get; set; }
+            public required Guid Id { get; set; }
         }
 
         public class Handler(AppDbContext context) : IRequestHandler<Command, Result<Unit>>

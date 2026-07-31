@@ -1,10 +1,9 @@
-import {useEffect, useRef} from 'react';
-import { HubConnection, HubConnectionBuilder, HubConnectionState } from "@microsoft/signalr";
+import { useEffect } from 'react';
+import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import { useLocalObservable } from "mobx-react-lite";
 import { runInAction } from 'mobx';
 
 export const useComments = (activityId?: string) => {
-    const created = useRef(false);
     const commentStore = useLocalObservable(() => ({
         comments: [] as ChatComment[],
         hubConnection: null as HubConnection | null,
@@ -19,8 +18,8 @@ export const useComments = (activityId?: string) => {
                 .withAutomaticReconnect()
                 .build();
 
-            this.hubConnection.start().catch(error => console.log('Error establishing connection: ', error));
-
+            // Handlers must be registered before start() so the LoadComments
+            // message sent from OnConnectedAsync is not missed.
             this.hubConnection.on('LoadComments', comments => {
                 runInAction(() => {
                     this.comments = comments
@@ -31,25 +30,29 @@ export const useComments = (activityId?: string) => {
                 runInAction(() => {
                     this.comments.unshift(comment)
                 })
-            })
+            });
+
+            this.hubConnection.start().catch(error => console.log('Error establishing connection: ', error));
         },
 
         stopHubConnection() {
-            if (this.hubConnection?.state === HubConnectionState.Connected) {
-                this.hubConnection.stop().catch(error => console.log('Error stopping connection: ', error));
-            }
+            if (!this.hubConnection) return;
+
+            this.hubConnection.stop().catch(error => console.log('Error stopping connection: ', error));
+            this.hubConnection = null;
         },
     }));
 
     useEffect(() => {
-        if (activityId && !created.current) {
-            commentStore.createHubConnection(activityId);
-            created.current = true;
-        }
+        if (!activityId) return;
+
+        commentStore.createHubConnection(activityId);
 
         return () => {
             commentStore.stopHubConnection();
-            commentStore.comments = [];
+            runInAction(() => {
+                commentStore.comments = [];
+            });
         };
     }, [activityId, commentStore]);
 

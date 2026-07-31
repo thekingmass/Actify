@@ -13,7 +13,7 @@ export default function ProfileFollowings({ activeTab }: Props) {
     const { profile, followings, loadingFollowings } = useProfile(id, predicate);
 
     return (
-        <Box>
+        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h5">
                     {activeTab === 3 ? `People following ${profile?.displayName}` : `People ${profile?.displayName} is following`}
@@ -25,7 +25,7 @@ export default function ProfileFollowings({ activeTab }: Props) {
                 ? <Typography>No {predicate} Found</Typography>
                 : (loadingFollowings
                     ? <Typography>Loading...</Typography>
-                    : <Box sx={{ display: 'flex', marginTop: 3 }}>
+                    : <Box sx={{ display: 'flex', flexWrap: 'wrap', marginTop: 3, gap: 1, paddingBottom:1 }}>
                         {followings?.map(profile => (
                             <ProfileCard profile={profile} key={profile.id} />
                         ))}
