@@ -20,7 +20,7 @@ export default function HomePage() {
       <Box sx={{ display: 'flex', alignItems: 'center', alignContent: 'center', color: 'white', gap: 3 }}>
         <Group sx={{ height: 110, width: 110 }} />
         <Typography variant="h1" sx={{ fontWeight: 'bold' }}>
-          Reactivities
+          Actify
         </Typography>
       </Box>
       <Typography variant="h2">

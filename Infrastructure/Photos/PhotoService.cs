@@ -65,7 +65,7 @@ namespace Infrastructure.Photos
                 return new PhotoUploadResult
                 {
                     PublicId = uploadResult.PublicId,
-                    Url = uploadResult.Url.AbsoluteUri
+                    Url = uploadResult.SecureUrl.AbsoluteUri
                 };
 
             }

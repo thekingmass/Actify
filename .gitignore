@@ -485,3 +485,4 @@ $RECYCLE.BIN/
 /API/appsettings.json
 /API/reactivities.db
 API/reactivities.db-shm
+/SQLQuery_Reactivities.sql

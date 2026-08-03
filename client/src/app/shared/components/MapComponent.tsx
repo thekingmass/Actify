@@ -5,6 +5,8 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import { Icon } from 'leaflet';
+import markerIconPng from 'leaflet/dist/images/marker-icon.png'
 
 const DefaultIcon = L.icon({
     iconUrl: markerIcon,
@@ -23,7 +25,7 @@ export default function MapComponent({position, venue}: Props) {
     return (
         <MapContainer center={position} zoom={13} scrollWheelZoom={true} style={{ height: "100%" }}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
-            <Marker position={position}>
+            <Marker position={position} icon={new Icon({iconUrl:markerIconPng})}>
                 <Popup>
                     {venue}
                 </Popup>

@@ -26,7 +26,7 @@ export default function NavBar() {
                   <Group fontSize='large' />
                   <Typography variant="h4" 
                     sx={{ fontWeight: 'bold', position: 'relative' }}>
-                      Reactivities
+                      Actify
                   </Typography>
                   <Observer>
                     {() =>
