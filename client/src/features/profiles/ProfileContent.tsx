@@ -15,8 +15,8 @@ export default function ProfileContent() {
         { label: 'About', content: <ProfileAbout /> },
         { label: 'Photos', content: <ProfilePhoto /> },
         { label: 'Events', content: <ProfileActivities /> },
-        { label: 'Followers', content: <ProfileFollowings activeTab={value}/> },
-        { label: 'Following', content: <ProfileFollowings activeTab={value}/> }
+        { label: 'Followers', content: <ProfileFollowings activeTab={value} setTab={setValue}/> },
+        { label: 'Following', content: <ProfileFollowings activeTab={value} setTab={setValue}/> }
     ];
 
     return (

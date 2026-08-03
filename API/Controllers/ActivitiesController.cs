@@ -32,7 +32,6 @@ public class ActivitiesController : BaseApiController
     public async Task<ActionResult<Guid>> CreateActivity(CreateActivityDto activityDto)
     {
         return HandleResult(await Mediator.Send(new CreateActivity.Command { ActivityDto = activityDto }));
-
     }
 
     [HttpPut("{id}")]

@@ -9,6 +9,6 @@ public sealed class CreateActivityValidator : BaseActivityValidator<CreateActivi
 {
     public CreateActivityValidator() : base(x => x.ActivityDto)
     {
-
+        
     }
 }

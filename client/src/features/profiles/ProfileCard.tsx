@@ -1,15 +1,18 @@
 import { Box, Card, CardContent, CardMedia, Divider, Tooltip, Typography } from "@mui/material";
-import { CheckCircle, Person } from "@mui/icons-material";
+import { Person } from "@mui/icons-material";
 import { Link } from "react-router";
+import type { Dispatch, SetStateAction } from "react";
+import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 
 type Props = {
-    profile: Profile
+    profile: Profile,
+    setTab: Dispatch<SetStateAction<number>>
 }
 
-export default function ProfileCard({ profile }: Props) {
+export default function ProfileCard({ profile, setTab }: Props) {
 
     return (
-        <Link to={`/profiles/${profile.id}`} style={{ textDecoration: 'none' }}>
+        <Link to={`/profiles/${profile.id}`} style={{ textDecoration: 'none' }} onClick={() => setTab(0)}>
             <Card sx={{ borderRadius: 3, p: 3, maxWidth: 250, textDecoration: 'none' }} elevation={4}>
                 <CardMedia
                     component='img'
@@ -19,11 +22,12 @@ export default function ProfileCard({ profile }: Props) {
                 />
                 <CardContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, position: 'relative' }}>
                             {profile.displayName}
                             {profile.amIFollowing &&
-                                <Tooltip title="Following" arrow placement="top">
-                                    <CheckCircle fontSize="small" color="secondary" />
+                                <Tooltip title="Following" arrow placement="top" >
+                                    {/* <CheckCircle fontSize="small" color="secondary" /> */}
+                                    <GroupOutlinedIcon sx={{position: 'absolute', right:'0'}}/>
                                 </Tooltip>}
                         </Typography>
 
