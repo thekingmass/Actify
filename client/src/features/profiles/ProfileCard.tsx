@@ -6,13 +6,16 @@ import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 
 type Props = {
     profile: Profile,
-    setTab: Dispatch<SetStateAction<number>>
+    setTab?: Dispatch<SetStateAction<number>>
 }
 
 export default function ProfileCard({ profile, setTab }: Props) {
 
     return (
-        <Link to={`/profiles/${profile.id}`} style={{ textDecoration: 'none' }} onClick={() => setTab(0)}>
+        <Link to={`/profiles/${profile.id}`} style={{ textDecoration: 'none' }} 
+            onClick={() => 
+            (setTab ? setTab(0) : null)
+            }>
             <Card sx={{ borderRadius: 3, p: 3, maxWidth: 250, textDecoration: 'none' }} elevation={4}>
                 <CardMedia
                     component='img'

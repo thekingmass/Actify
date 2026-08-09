@@ -6,6 +6,7 @@ using Application.Core;
 using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Email;
 using Infrastructure.Photos;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using Resend;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,16 @@ builder.Services.AddMediatR(x => {
     x.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
+// ResendEmail Services
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>(opt =>
+{
+    opt.ApiToken = builder.Configuration["Resend:ApiToken"]!;
+});
+builder.Services.AddTransient<IResend, ResendClient>();
+builder.Services.AddTransient<IEmailSender<User>, EmailSender>();
+
+//
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 
 builder.Services.AddScoped<IPhotoService, PhotoService>();
@@ -60,6 +72,7 @@ builder.Services.AddTransient<ExceptionMiddleware>();
 builder.Services.AddIdentityApiEndpoints<User>(opt =>
 {
     opt.User.RequireUniqueEmail = true;
+    opt.SignIn.RequireConfirmedEmail = true;
 })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
@@ -95,7 +108,7 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
 .AllowCredentials()
-.WithOrigins("http://localhost:3000", "https://localhost:3000", "http://localhost:4174"));
+.WithOrigins("https://localhost:3000", "http://localhost:3000"));
 
 app.UseAuthentication();
 app.UseAuthorization();
