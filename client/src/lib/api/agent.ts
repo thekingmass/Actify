@@ -21,12 +21,12 @@ agent.interceptors.request.use(config => {
 
 agent.interceptors.response.use(
     async response => {
-        // if(import.meta.env.DEV) await sleep(1000);
+        if (import.meta.env.DEV) await sleep(1000);
         store.uiStore.isIdle();
         return response;
     },
     async error => {
-        if(import.meta.env.DEV) await sleep(1000);
+        if (import.meta.env.DEV) await sleep(1000);
         store.uiStore.isIdle();
         const { status, data } = error.response;
         switch (status) {
@@ -45,13 +45,18 @@ agent.interceptors.response.use(
                 }
                 break;
             case 401:
-                toast.error('Unauthorised');
+                if (data.detail === 'NotAllowed') {
+                    throw new Error(data.detail)
+                }
+                else {
+                    toast.error('Unauthorised');
+                }
                 break;
             case 404:
                 router.navigate('/not-found');
                 break;
             case 500:
-                router.navigate('/server-error', {state: {error: data}});
+                router.navigate('/server-error', { state: { error: data } });
                 break;
         }
 
